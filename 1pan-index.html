@@ -1,0 +1,88 @@
+<style>
+    canvas {
+        background: #fafafa;
+        border: 1px solid;
+    }
+    </style>
+    <canvas></canvas>
+    
+    
+    <script>
+    
+    let canvas = document.querySelector("canvas");
+    let ctx = canvas.getContext("2d");
+    let width = 600;
+    let height = 600;
+    let dpi = 4;
+    let cellSize = 10;
+    let pressed = false;
+    canvas.height = height * dpi;
+    canvas.width = width * dpi;
+    canvas.style.height = height + "px";
+    canvas.style.width = width + "px";
+    canvas.addEventListener("mousedown", (e) => mousedown(e));
+    canvas.addEventListener("mouseup", (e) => mouseup(e));
+    canvas.addEventListener("mousemove", (e) => mousemove(e));
+    
+    let offset = {x: 0, y: 0};
+    
+    draw();
+    
+    function draw() {
+       ctx.save();
+       ctx.scale(dpi, dpi);
+       ctx.translate(-0.5, -0.5);
+      
+       ctx.lineWidth = 1;
+       ctx.strokeStyle = "silver";
+       ctx.beginPath();
+      
+       for (let x = offset.x; x < width; x += cellSize) {
+         ctx.moveTo(x, 0);
+         ctx.lineTo(x, height);
+       }
+      
+       for (let y = offset.y; y < height; y += cellSize) {
+         ctx.moveTo(0, y);
+         ctx.lineTo(width, y);
+       }
+      
+       ctx.closePath();
+       ctx.stroke();
+      
+       ctx.restore();
+     }
+     
+     function mousedown(e) {
+        pressed = true;
+     }
+      
+     function mouseup(e) {
+        pressed = false;
+     }
+     
+     function mousemove(e) {
+        if (!pressed) {
+          return;
+        }
+        
+        ctx.clearRect(0, 0, width * dpi, height * dpi);
+          
+        offset.x += e.movementX;
+        offset.y += e.movementY;
+        
+            let signX = offset.x > 0 ? 1 : -1;
+            let signY = offset.y > 0 ? 1 : -1;
+        
+            offset = {
+               x: (Math.abs(offset.x) > cellSize)
+                    ? offset.x - Math.floor((offset.x * signX) / cellSize) * cellSize * signX
+                    : offset.x,
+               y: (Math.abs(offset.y) > cellSize)
+                    ? offset.y - Math.floor((offset.y * signY) / cellSize) * cellSize * signY
+                    : offset.y
+            };
+        
+        draw();
+     }
+    </script>
